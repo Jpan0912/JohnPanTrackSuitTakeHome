@@ -5,16 +5,29 @@ import styles from "./app.module.css";
 import type { Insight } from "../schemas/insight.ts";
 
 export const App = () => {
-  const [insights, setInsights] = useState<Insight>([]);
+  const [insights, setInsights] = useState<Insight[]>([]); // Bug Fixed for wanting a list of insights, not a single insight
 
-  useEffect(() => {
-    fetch(`/api/insights`).then((res) => setInsights(res.json()));
+  // 🟢 Added: refresh function so delete/add can reload insights
+  const refresh = async () => {
+    const res = await fetch("/insights");
+    const data = await res.json();
+    setInsights(data);
+  };
+
+  useEffect(() => {                                         // Bug fixed for insights needing to set on a Promise instead of array
+    const load = async () => {
+      const res = await fetch("/insights");
+      const data = await res.json();
+      setInsights(data);
+    };
+    load();
   }, []);
 
   return (
     <main className={styles.main}>
       <Header />
-      <Insights className={styles.insights} insights={insights} />
+      {/* Added: pass refresh so Insights can update after delete */}
+      <Insights className={styles.insights} insights={insights} refresh={refresh} />
     </main>
   );
 };

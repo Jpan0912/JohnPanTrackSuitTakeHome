@@ -43,7 +43,7 @@ router.get("/insights/:id", (ctx) => {
   const params = ctx.params as Record<string, any>;
   const result = lookupInsight({ db, id: params.id });
   ctx.response.body = result;
-  ctx.response.status = 200;
+  ctx.response.status = 200; // Bug fixed for correct status code response.status and not response.body
 });
 
 router.post("/insights", async (ctx) => {

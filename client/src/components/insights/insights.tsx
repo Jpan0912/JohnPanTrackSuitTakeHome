@@ -6,34 +6,46 @@ import type { Insight } from "../../schemas/insight.ts";
 type InsightsProps = {
   insights: Insight[];
   className?: string;
+  refresh?: () => void; // 🟢 allow parent to trigger reload
 };
 
-export const Insights = ({ insights, className }: InsightsProps) => {
-  const deleteInsight = () => undefined;
+export const Insights = ({ insights, className, refresh }: InsightsProps) => {
+  // 🟢 delete a specific insight by ID
+  const deleteInsight = async (id: number) => {
+    await fetch(`/insights/${id}`, {
+      method: "DELETE",
+    });
+
+    refresh?.(); // 🟢 reload list after deletion
+  };
 
   return (
     <div className={cx(className)}>
       <h1 className={styles.heading}>Insights</h1>
+
       <div className={styles.list}>
-        {insights?.length
-          ? (
-            insights.map(({ id, text, date, brandId }) => (
-              <div className={styles.insight} key={id}>
-                <div className={styles["insight-meta"]}>
-                  <span>{brandId}</span>
-                  <div className={styles["insight-meta-details"]}>
-                    <span>{date.toString()}</span>
-                    <Trash2Icon
-                      className={styles["insight-delete"]}
-                      onClick={deleteInsight}
-                    />
-                  </div>
+        {insights?.length ? (
+          insights.map(({ id, text, createdAt, brand }) => (
+            <div className={styles.insight} key={id}>
+              <div className={styles["insight-meta"]}>
+                <span>{brand}</span>
+
+                <div className={styles["insight-meta-details"]}>
+                  <span>{new Date(createdAt).toLocaleString()}</span>
+
+                  <Trash2Icon
+                    className={styles["insight-delete"]}
+                    onClick={() => deleteInsight(id)} // 🟢 pass ID
+                  />
                 </div>
-                <p className={styles["insight-content"]}>{text}</p>
               </div>
-            ))
-          )
-          : <p>We have no insight!</p>}
+
+              <p className={styles["insight-content"]}>{text}</p>
+            </div>
+          ))
+        ) : (
+          <p>We have no insight!</p>
+        )}
       </div>
     </div>
   );

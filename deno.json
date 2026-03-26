@@ -7,8 +7,8 @@
       "command": "",
       "dependencies": ["dev:server", "dev:client"]
     },
-    "dev:server": "cd server && deno task dev",
-    "dev:client": "cd client && deno task dev",
+    "dev:server": "cd server && deno run --allow-net --allow-read --allow-write --allow-ffi --allow-env --env-file=../.env --watch main.ts",
+    "dev:client": "cd client && deno run -A --env-file=../.env npm:vite",
     "test:client": "cd client && deno task test"
   },
   "compilerOptions": {
